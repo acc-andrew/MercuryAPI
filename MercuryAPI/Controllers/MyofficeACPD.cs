@@ -26,7 +26,7 @@ namespace MercuryAPI.Controllers
 
             
             // 狀況 0=正常 , 99=不正常{ get; set; }
-            public char acpd_status { get; set; }
+            public int acpd_status { get; set; }
 
             //是否停用/不可登入
             public bool acpd_stop { get; set; }
