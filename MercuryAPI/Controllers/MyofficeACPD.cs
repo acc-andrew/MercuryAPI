@@ -71,6 +71,7 @@ namespace MercuryAPI.Controllers
         }
 
         [HttpPost]
+        [Route("full")]
         public async Task<IActionResult> Post(MyOfficeACPD_Data data)
         {
             string jsonInput = JsonSerializer.Serialize(data);
