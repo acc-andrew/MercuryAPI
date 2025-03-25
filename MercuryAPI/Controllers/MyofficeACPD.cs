@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Data.SqlClient;
+using System.Reflection;
 
 namespace MercuryAPI.Controllers
 {
@@ -38,7 +39,7 @@ namespace MercuryAPI.Controllers
             public string acpd_LoginID { get; set; }
 
             //  登入密碼
-            public string acpd_LoginPW { get; set; }
+            public string acpd_LoginPWD { get; set; }
 
             // 備註
             public string acpd_memo { get; set; }
@@ -47,10 +48,10 @@ namespace MercuryAPI.Controllers
             public DateTime acpd_nowdatetime { get; set; }
 
             //新增人員代碼
-            public string appd_nowid { get; set; }
+            public string acpd_nowid { get; set; }
 
             // 修改日期
-            public DateTime acpd_upddatetitme { get; set; }
+            public DateTime acpd_upddatetime { get; set; }
 
             // 修改人員代碼
             public string acpd_updid { get; set; }
@@ -79,10 +80,87 @@ namespace MercuryAPI.Controllers
             {
                 await connection.OpenAsync();
 
-                using (var command = new SqlCommand("createMyofficeACPD", connection))
+                using (var command = new SqlCommand("sp_createMyofficeACPD", connection))
                 {
                     command.CommandType = System.Data.CommandType.StoredProcedure;
-                    command.Parameters.AddWithValue("@InputJSON", jsonInput);
+                    //command.Parameters.AddWithValue("@InputJSON", jsonInput);
+
+                    // insert variable to parameters
+                    command.Parameters.AddWithValue("@ACPD_SID", data.acpd_sid);
+                    command.Parameters.AddWithValue("@ACPD_Cname", data.acpd_cname);
+                    command.Parameters.AddWithValue("@ACPD_Ename", data.acpd_ename);
+
+                    command.Parameters.AddWithValue("@ACPD_Sname", data.acpd_sname);
+                    command.Parameters.AddWithValue("@ACPD_Email", data.acpd_email);
+                    command.Parameters.AddWithValue("@ACPD_Status", data.acpd_status);
+
+                    command.Parameters.AddWithValue("@ACPD_Stop", data.acpd_stop);
+                    command.Parameters.AddWithValue("@ACPD_StopMemo", data.acpd_stopMemo);
+                    command.Parameters.AddWithValue("@ACPD_LoginID", data.acpd_LoginID);
+
+                    command.Parameters.AddWithValue("@ACPD_LoginPWD", data.acpd_LoginPWD);
+                    command.Parameters.AddWithValue("@ACPD_Memo", data.acpd_memo);
+                    command.Parameters.AddWithValue("@ACPD_NowID", data.acpd_nowid);
+
+                    command.Parameters.AddWithValue("@ACPD_UPDID", data.acpd_updid);
+
+                    command.Parameters.AddWithValue("@ACPD_NowDateTime", data.acpd_nowdatetime);
+                    command.Parameters.AddWithValue("@ACPD_UPDDateTime", data.acpd_upddatetime);
+
+
+                    // 定義輸出參數
+                    var statusParam = new SqlParameter
+                    {
+                        ParameterName = "@StatusOutput",
+                        SqlDbType = System.Data.SqlDbType.Int,
+                        Direction = System.Data.ParameterDirection.Output
+                    };
+                    command.Parameters.Add(statusParam);
+
+                    await command.ExecuteNonQueryAsync();
+
+                    // 獲取處理狀態
+                    int status = (int)(statusParam.Value ?? -1);
+                    return Ok(status.ToString());
+                }
+            }
+        }
+
+        [HttpPut]
+        [Route("Update")]
+        public async Task<IActionResult> UpdateACPD(MyOfficeACPD_Data data)
+        {
+            using (var connection = new SqlConnection(connectionString))
+            {
+                await connection.OpenAsync();
+
+                using (var command = new SqlCommand("sp_updateMyofficeACPD", connection))
+                {
+                    command.CommandType = System.Data.CommandType.StoredProcedure;
+                    //command.Parameters.AddWithValue("@InputJSON", jsonInput);
+
+                    // insert variable to parameters
+                    command.Parameters.AddWithValue("@ACPD_SID", data.acpd_sid);
+                    command.Parameters.AddWithValue("@ACPD_Cname", data.acpd_cname);
+                    command.Parameters.AddWithValue("@ACPD_Ename", data.acpd_ename);
+
+                    command.Parameters.AddWithValue("@ACPD_Sname", data.acpd_sname);
+                    command.Parameters.AddWithValue("@ACPD_Email", data.acpd_email);
+                    command.Parameters.AddWithValue("@ACPD_Status", data.acpd_status);
+
+                    command.Parameters.AddWithValue("@ACPD_Stop", data.acpd_stop);
+                    command.Parameters.AddWithValue("@ACPD_StopMemo", data.acpd_stopMemo);
+                    command.Parameters.AddWithValue("@ACPD_LoginID", data.acpd_LoginID);
+
+                    command.Parameters.AddWithValue("@ACPD_LoginPWD", data.acpd_LoginPWD);
+                    command.Parameters.AddWithValue("@ACPD_Memo", data.acpd_memo);
+                    command.Parameters.AddWithValue("@ACPD_NowID", data.acpd_nowid);
+
+                    command.Parameters.AddWithValue("@ACPD_UPDID", data.acpd_updid);
+
+                    //command.Parameters.AddWithValue("@ACPD_NowDateTime", data.acpd_nowdatetime);
+                    //command.Parameters.AddWithValue("@ACPD_UPDDateTime", data.acpd_upddatetime);
+
 
                     // 定義輸出參數
                     var statusParam = new SqlParameter

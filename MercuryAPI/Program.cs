@@ -23,6 +23,11 @@ namespace MercuryAPI
                 app.UseSwaggerUI();
             }
 
+            // CORS
+            app.UseCors(c=>c.AllowAnyHeader()
+                            .AllowAnyOrigin()
+                            .AllowAnyMethod());
+
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
