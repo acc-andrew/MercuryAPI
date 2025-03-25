@@ -179,6 +179,40 @@ namespace MercuryAPI.Controllers
                 }
             }
         }
+
+        [HttpDelete]
+        [Route("Delete")]
+        public async Task<IActionResult> DeleteACPD(string SID)
+        {
+            using (var connection = new SqlConnection(connectionString))
+            {
+                await connection.OpenAsync();
+
+                using (var command = new SqlCommand("sp_deleteMyofficeACPD", connection))
+                {
+                    command.CommandType = System.Data.CommandType.StoredProcedure;
+                    //command.Parameters.AddWithValue("@InputJSON", jsonInput);
+
+                    // insert variable to parameters
+                    command.Parameters.AddWithValue("@ACPD_SID", SID);
+
+                    // 定義輸出參數
+                    var statusParam = new SqlParameter
+                    {
+                        ParameterName = "@StatusOutput",
+                        SqlDbType = System.Data.SqlDbType.Int,
+                        Direction = System.Data.ParameterDirection.Output
+                    };
+                    command.Parameters.Add(statusParam);
+
+                    await command.ExecuteNonQueryAsync();
+
+                    // 獲取處理狀態
+                    int status = (int)(statusParam.Value ?? -1);
+                    return Ok(status.ToString());
+                }
+            }
+        }
     }
 
 }
